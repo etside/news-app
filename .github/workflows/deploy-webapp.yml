@@ -1,0 +1,43 @@
+name: Deploy Web App
+
+on:
+  push:
+    branches: [main]
+    paths: ['webapp/**']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build deployment ZIP
+        run: |
+          cd webapp
+          zip -r ../webapp-deploy.zip . \
+            -x ".git/*" \
+            -x "node_modules/*" \
+            -x "*.log" \
+            -x ".env"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: webapp-deploy-${{ github.sha }}
+          path: webapp-deploy.zip
+          retention-days: 7
+
+      # Optional: Auto-deploy via FTP/SFTP
+      # Uncomment and configure for your hosting provider
+      #
+      # - name: Deploy via FTP
+      #   uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      #   with:
+      #     server: ${{ secrets.FTP_SERVER }}
+      #     username: ${{ secrets.FTP_USERNAME }}
+      #     password: ${{ secrets.FTP_PASSWORD }}
+      #     server-dir: /public_html/
+      #     local-dir: ./webapp/

@@ -1,0 +1,19 @@
+RewriteEngine On
+
+# Handle CORS
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+
+# API Routes
+RewriteRule ^api/chat/stream\.php$ - [L]
+RewriteRule ^api/chat/completions\.php$ - [L]
+RewriteRule ^api/(.*)$ api/$1 [L]
+
+# Static assets
+RewriteRule ^assets/(.*)$ - [L]
+
+# SPA fallback - serve index.php for all other routes
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
