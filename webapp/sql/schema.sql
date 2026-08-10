@@ -1,7 +1,5 @@
 -- OpenClaude Web App Database Schema
-
-CREATE DATABASE IF NOT EXISTS openclaude_web;
-USE openclaude_web;
+-- Run this in phpMyAdmin on your existing 'torquest_devlover' database
 
 -- Users (GitHub OAuth)
 CREATE TABLE IF NOT EXISTS users (
