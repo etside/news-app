@@ -6,29 +6,41 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(8px);
+    animation: overlayIn 0.2s ease;
+}
+
+@keyframes overlayIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .settings-panel {
     width: 100%;
-    max-width: 500px;
-    max-height: 90vh;
-    background: var(--bg-secondary);
+    max-width: 520px;
+    max-height: 85vh;
+    background: var(--bg-elevated);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: var(--radius-xl);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    box-shadow: var(--shadow-xl);
+    animation: panelIn 0.25s ease;
+}
+
+@keyframes panelIn {
+    from { opacity: 0; transform: scale(0.95) translateY(16px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .settings-header {
-    padding: 16px 20px;
+    padding: 20px 24px;
     border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
@@ -36,8 +48,9 @@
 }
 
 .settings-header h2 {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
+    letter-spacing: -0.01em;
 }
 
 .settings-close {
@@ -45,26 +58,27 @@
     border: none;
     color: var(--text-secondary);
     cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
+    padding: 6px;
+    border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background var(--transition-fast), color var(--transition-fast);
 }
 
 .settings-close:hover {
-    background: var(--bg-tertiary);
+    background: var(--bg-hover);
     color: var(--text-primary);
 }
 
 .settings-content {
     flex: 1;
     overflow-y: auto;
-    padding: 20px;
+    padding: 24px;
 }
 
 .settings-section {
-    margin-bottom: 24px;
+    margin-bottom: 28px;
 }
 
 .settings-section:last-child {
@@ -72,12 +86,12 @@
 }
 
 .settings-section h3 {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-secondary);
-    margin-bottom: 12px;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    margin-bottom: 14px;
 }
 
 .form-group {
@@ -93,23 +107,25 @@
     font-size: 13px;
     color: var(--text-primary);
     margin-bottom: 6px;
+    font-weight: 500;
 }
 
 .form-control {
     width: 100%;
-    padding: 8px 12px;
+    padding: 10px 14px;
     background: var(--bg-primary);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-md);
     color: var(--text-primary);
     font-size: 13px;
     font-family: var(--font-sans);
-    transition: border-color 0.15s ease;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .form-control:focus {
     outline: none;
-    border-color: var(--accent-blue);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(255, 154, 0, 0.1);
 }
 
 .form-control::placeholder {
@@ -118,16 +134,18 @@
 
 select.form-control {
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238b949e' viewBox='0 0 16 16'%3E%3Cpath d='M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23898989' viewBox='0 0 16 16'%3E%3Cpath d='M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 32px;
+    cursor: pointer;
 }
 
 textarea.form-control {
     resize: vertical;
     min-height: 80px;
     font-family: var(--font-mono);
+    line-height: 1.5;
 }
 
 .form-help {
@@ -138,7 +156,7 @@ textarea.form-control {
 }
 
 .form-help a {
-    color: var(--accent-blue);
+    color: var(--accent-primary);
     text-decoration: none;
 }
 
@@ -160,20 +178,23 @@ input[type="range"].form-control {
 
 input[type="range"].form-control::-webkit-slider-thumb {
     appearance: none;
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    background: var(--accent-blue);
+    background: var(--accent-primary);
     cursor: pointer;
+    border: 2px solid var(--bg-primary);
+    box-shadow: var(--shadow-sm);
 }
 
 input[type="range"].form-control::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    background: var(--accent-blue);
+    background: var(--accent-primary);
     cursor: pointer;
-    border: none;
+    border: 2px solid var(--bg-primary);
+    box-shadow: var(--shadow-sm);
 }
 
 /* User info */
@@ -183,14 +204,15 @@ input[type="range"].form-control::-moz-range-thumb {
     gap: 12px;
     padding: 12px;
     background: var(--bg-tertiary);
-    border-radius: 6px;
+    border-radius: var(--radius-md);
     margin-bottom: 12px;
 }
 
 .user-avatar {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
+    border: 2px solid var(--border-color);
 }
 
 #username {
@@ -202,7 +224,7 @@ input[type="range"].form-control::-moz-range-thumb {
 .provider-info {
     background: var(--bg-tertiary);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-md);
     padding: 12px;
     margin-top: 12px;
 }
@@ -238,6 +260,7 @@ input[type="range"].form-control::-moz-range-thumb {
 
 .status-dot.connected {
     background: var(--accent-green);
+    box-shadow: 0 0 6px rgba(63, 185, 80, 0.4);
 }
 
 .status-dot.disconnected {
@@ -246,4 +269,18 @@ input[type="range"].form-control::-moz-range-thumb {
 
 .status-dot.warning {
     background: var(--accent-orange);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .settings-panel {
+        max-width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+        height: 100%;
+    }
+
+    .settings-content {
+        padding: 20px;
+    }
 }
