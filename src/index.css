@@ -2,7 +2,7 @@
 
 /* ════════════════════════════════════════════════════════════════════════
    Dhaka Heralds — Apple News-like Design Tokens
-   Crimson Maroon Gold brand, dark-first, glass surfaces
+   Gold brand, dark-first, glass surfaces
    ════════════════════════════════════════════════════════════════════════ */
 
 @theme {
@@ -102,9 +102,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 a { color: inherit; text-decoration: none; }
-
 img { max-width: 100%; display: block; }
-
 button { font: inherit; cursor: pointer; border: none; background: none; }
 
 /* ── Glass utility ────────────────────────────────────────────────── */
@@ -112,13 +110,6 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
   background: var(--glass-bg);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid var(--glass-border);
-}
-
-.glass-light {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px) saturate(150%);
-  -webkit-backdrop-filter: blur(12px) saturate(150%);
   border: 1px solid var(--glass-border);
 }
 
@@ -134,55 +125,89 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
 ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-/* ── Skip to content ──────────────────────────────────────────────── */
-.skip-to-content {
-  position: absolute;
-  left: -9999px;
-  top: 0;
-  z-index: 100;
-  padding: 0.75rem 1.5rem;
-  background: var(--gold);
-  color: #000;
-  font-weight: 600;
-  border-radius: 0 0 var(--radius-sm) 0;
+/* ── Splash: GIF intro (desktop/tablet) ───────────────────────────── */
+@keyframes splashFadeIn {
+  0% { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
 }
-.skip-to-content:focus { left: 0; }
+
+@keyframes splashFadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.splash-gif-enter { animation: splashFadeIn 0.5s ease-out forwards; }
+.splash-gif-exit { animation: splashFadeOut 0.4s ease-in forwards; }
+
+/* ── Splash: Mobile racing gold lines ─────────────────────────────── */
+@keyframes raceLine1 {
+  0% {
+    transform: translate(0, 0) rotate(45deg) scaleX(0);
+    opacity: 0;
+  }
+  5% { opacity: 1; transform: translate(0, 0) rotate(45deg) scaleX(0.1); }
+  90% { opacity: 1; transform: translate(calc(50vw - 60px), calc(50vh - 60px)) rotate(45deg) scaleX(1); }
+  100% {
+    transform: translate(calc(100vw - 60px), calc(100vh - 60px)) rotate(45deg) scaleX(1);
+    opacity: 0;
+  }
+}
+
+@keyframes raceLine2 {
+  0% {
+    transform: translate(0, 0) rotate(45deg) scaleX(0);
+    opacity: 0;
+  }
+  8% { opacity: 1; transform: translate(0, 0) rotate(45deg) scaleX(0.1); }
+  88% { opacity: 1; transform: translate(calc(50vw - 40px), calc(50vh - 40px)) rotate(45deg) scaleX(1); }
+  100% {
+    transform: translate(calc(100vw - 40px), calc(100vh - 40px)) rotate(45deg) scaleX(1);
+    opacity: 0;
+  }
+}
+
+@keyframes cornerBurst {
+  0% { transform: scale(0); opacity: 1; }
+  50% { transform: scale(2.5); opacity: 0.6; }
+  100% { transform: scale(4); opacity: 0; }
+}
+
+@keyframes logoReveal {
+  0% { opacity: 0; transform: scale(0.7); }
+  60% { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes logoGlow {
+  0%, 100% { text-shadow: 0 0 20px rgba(200,149,26,0.3); }
+  50% { text-shadow: 0 0 40px rgba(200,149,26,0.6), 0 0 80px rgba(240,180,41,0.3); }
+}
+
+/* ── Masonry grid ─────────────────────────────────────────────────── */
+.masonry-grid {
+  column-count: 1;
+  column-gap: 16px;
+}
+@media (min-width: 640px)  { .masonry-grid { column-count: 2; } }
+@media (min-width: 768px)  { .masonry-grid { column-count: 3; } }
+@media (min-width: 1024px) { .masonry-grid { column-count: 4; } }
+@media (min-width: 1280px) { .masonry-grid { column-count: 5; } }
+
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 16px;
+}
 
 /* ── Skeleton shimmer ─────────────────────────────────────────────── */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
-
 .skeleton-shimmer {
-  background: linear-gradient(
-    90deg,
-    var(--surface) 25%,
-    var(--surface-2) 50%,
-    var(--surface) 75%
-  );
+  background: linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
   border-radius: var(--radius-sm);
-}
-
-/* ── Splash racing lines ──────────────────────────────────────────── */
-@keyframes raceDiagonal {
-  0%   { transform: translate(0, 0) rotate(45deg); opacity: 0; }
-  5%   { opacity: 1; }
-  95%  { opacity: 1; }
-  100% { transform: translate(calc(100vw - 120px), calc(100vh - 2px)) rotate(45deg); opacity: 0; }
-}
-
-@keyframes lineGlowPulse {
-  0%, 100% { box-shadow: 0 0 12px 4px rgba(200,149,26,0.4), 0 0 24px 8px rgba(240,180,41,0.2); }
-  50%      { box-shadow: 0 0 20px 8px rgba(200,149,26,0.6), 0 0 40px 16px rgba(240,180,41,0.3); }
-}
-
-@keyframes burstGlow {
-  0%   { transform: scale(0); opacity: 1; }
-  50%  { transform: scale(1.5); opacity: 0.8; }
-  100% { transform: scale(2); opacity: 0; }
 }
 
 /* ── Reduced motion ───────────────────────────────────────────────── */
