@@ -55,7 +55,7 @@ function DesktopSplash({ phase }: { phase: 'enter' | 'exit' }) {
   );
 }
 
-/* ── Mobile: centered GIF intro (same as desktop, smaller) ───────── */
+/* ── Mobile: centered GIF intro (smaller) ────────────────────────── */
 function MobileSplash({ phase }: { phase: 'enter' | 'exit' }) {
   return (
     <div

@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 /* ════════════════════════════════════════════════════════════════════════
-   Dhaka Heralds — Apple News-like Design Tokens
-   Gold brand, dark-first, glass surfaces
+   Dhaka Heralds Analysis — High-Contrast Design System
+   Light: gold logo  |  Dark: white circle logo
+   Glassmorphism, urgency typography, gesture nav
    ════════════════════════════════════════════════════════════════════════ */
 
 @theme {
@@ -16,10 +17,15 @@
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
+  --color-text-inverse: var(--text-inverse);
   --color-glass-bg: var(--glass-bg);
   --color-glass-border: var(--glass-border);
   --color-border: var(--border-line);
   --color-border-strong: var(--border-strong);
+  --color-breaking: var(--breaking);
+  --color-high: var(--high);
+  --color-urgent-bg: var(--urgent-bg);
+  --color-urgent-border: var(--urgent-border);
   --font-headline: var(--font-headline);
   --font-body: var(--font-body);
   --radius-card: 20px;
@@ -29,44 +35,54 @@
   --radius-lg: 16px;
 }
 
-/* ── Dark theme (default) ─────────────────────────────────────────── */
+/* ── Dark theme (high-contrast, default) ──────────────────────────── */
 :root,
 .dark {
-  --background: #0D0D0F;
-  --surface: #151518;
-  --surface-2: #1C1C21;
-  --surface-3: #232328;
-  --gold: #C8951A;
-  --gold-secondary: #F0B429;
-  --gold-glow: rgba(200, 149, 26, 0.15);
-  --text-primary: #F5F5F0;
-  --text-secondary: #A8A8A3;
-  --text-muted: #6B6B66;
-  --border-line: rgba(245, 245, 240, 0.08);
-  --border-strong: rgba(245, 245, 240, 0.15);
-  --glass-bg: rgba(13, 13, 15, 0.72);
-  --glass-border: rgba(245, 245, 240, 0.06);
+  --background: #0A0A0C;
+  --surface: #121215;
+  --surface-2: #1A1A1F;
+  --surface-3: #222228;
+  --gold: #E8A820;
+  --gold-secondary: #FFD166;
+  --gold-glow: rgba(232, 168, 32, 0.18);
+  --text-primary: #FFFFFF;
+  --text-secondary: #B0B0AA;
+  --text-muted: #606058;
+  --text-inverse: #0A0A0C;
+  --border-line: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --glass-bg: rgba(10, 10, 12, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --breaking: #FF3B3B;
+  --high: #FF8C42;
+  --urgent-bg: rgba(255, 59, 59, 0.08);
+  --urgent-border: rgba(255, 59, 59, 0.3);
   --font-headline: 'Playfair Display', Georgia, serif;
   --font-body: 'Inter Tight', 'Inter', system-ui, sans-serif;
   color-scheme: dark;
 }
 
-/* ── Light theme ──────────────────────────────────────────────────── */
+/* ── Light theme (high-contrast) ──────────────────────────────────── */
 .light {
-  --background: #F5F5F0;
+  --background: #F7F6F1;
   --surface: #FFFFFF;
   --surface-2: #F0EFE8;
-  --surface-3: #E5E4DD;
+  --surface-3: #E4E3DA;
   --gold: #A07816;
-  --gold-secondary: #D49E22;
+  --gold-secondary: #C8951A;
   --gold-glow: rgba(160, 120, 22, 0.12);
-  --text-primary: #1A1A1A;
-  --text-secondary: #5A5A55;
-  --text-muted: #9A9A95;
+  --text-primary: #0A0A0C;
+  --text-secondary: #4A4A44;
+  --text-muted: #8A8A84;
+  --text-inverse: #FFFFFF;
   --border-line: rgba(0, 0, 0, 0.08);
-  --border-strong: rgba(0, 0, 0, 0.15);
-  --glass-bg: rgba(245, 245, 240, 0.72);
+  --border-strong: rgba(0, 0, 0, 0.16);
+  --glass-bg: rgba(247, 246, 241, 0.78);
   --glass-border: rgba(0, 0, 0, 0.06);
+  --breaking: #D32F2F;
+  --high: #E65100;
+  --urgent-bg: rgba(211, 47, 47, 0.06);
+  --urgent-border: rgba(211, 47, 47, 0.25);
   color-scheme: light;
 }
 
@@ -76,6 +92,7 @@
 html {
   scroll-behavior: smooth;
   background: var(--background);
+  overscroll-behavior: none;
 }
 
 body {
@@ -89,6 +106,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
 }
 
 ::selection { background: var(--gold); color: #000; }
@@ -108,9 +126,24 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
 /* ── Glass utility ────────────────────────────────────────────────── */
 .glass {
   background: var(--glass-bg);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
   border: 1px solid var(--glass-border);
+}
+
+.glass-strong {
+  background: var(--glass-bg);
+  backdrop-filter: blur(40px) saturate(220%);
+  -webkit-backdrop-filter: blur(40px) saturate(220%);
+  border: 1px solid var(--border-strong);
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
 }
 
 /* ── Focus ring ───────────────────────────────────────────────────── */
@@ -120,12 +153,45 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
 }
 
 /* ── Scrollbar ────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-/* ── Splash: GIF intro (desktop/tablet) ───────────────────────────── */
+/* ── Urgency typography ───────────────────────────────────────────── */
+.urgency-breaking {
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: var(--breaking);
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.urgency-high {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--high);
+}
+
+.urgency-normal {
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.urgency-low {
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--text-secondary);
+}
+
+/* ── Urgency card glow ────────────────────────────────────────────── */
+.card-breaking {
+  border: 1px solid var(--urgent-border);
+  background: var(--urgent-bg);
+}
+
+/* ── Splash: GIF intro ────────────────────────────────────────────── */
 @keyframes splashFadeIn {
   0% { opacity: 0; transform: scale(0.92); }
   100% { opacity: 1; transform: scale(1); }
@@ -139,48 +205,67 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
 .splash-gif-enter { animation: splashFadeIn 0.5s ease-out forwards; }
 .splash-gif-exit { animation: splashFadeOut 0.4s ease-in forwards; }
 
-/* ── Splash: Mobile racing gold lines ─────────────────────────────── */
-@keyframes raceLine1 {
-  0% {
-    transform: translate(0, 0) rotate(45deg) scaleX(0);
-    opacity: 0;
-  }
-  5% { opacity: 1; transform: translate(0, 0) rotate(45deg) scaleX(0.1); }
-  90% { opacity: 1; transform: translate(calc(50vw - 60px), calc(50vh - 60px)) rotate(45deg) scaleX(1); }
-  100% {
-    transform: translate(calc(100vw - 60px), calc(100vh - 60px)) rotate(45deg) scaleX(1);
-    opacity: 0;
-  }
+/* ── Gesture nav indicator ────────────────────────────────────────── */
+@keyframes gesturePulse {
+  0%, 100% { opacity: 0.3; transform: scaleX(0.8); }
+  50% { opacity: 0.7; transform: scaleX(1); }
 }
 
-@keyframes raceLine2 {
-  0% {
-    transform: translate(0, 0) rotate(45deg) scaleX(0);
-    opacity: 0;
-  }
-  8% { opacity: 1; transform: translate(0, 0) rotate(45deg) scaleX(0.1); }
-  88% { opacity: 1; transform: translate(calc(50vw - 40px), calc(50vh - 40px)) rotate(45deg) scaleX(1); }
-  100% {
-    transform: translate(calc(100vw - 40px), calc(100vh - 40px)) rotate(45deg) scaleX(1);
-    opacity: 0;
-  }
+.gesture-dot {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes cornerBurst {
-  0% { transform: scale(0); opacity: 1; }
-  50% { transform: scale(2.5); opacity: 0.6; }
-  100% { transform: scale(4); opacity: 0; }
+.gesture-dot-active {
+  background: var(--gold) !important;
+  transform: scaleX(1.5);
 }
 
-@keyframes logoReveal {
-  0% { opacity: 0; transform: scale(0.7); }
-  60% { opacity: 1; transform: scale(1.08); }
-  100% { opacity: 1; transform: scale(1); }
+/* ── Swipe hint animation ─────────────────────────────────────────── */
+@keyframes swipeHint {
+  0% { transform: translateX(0); opacity: 0.6; }
+  50% { transform: translateX(8px); opacity: 1; }
+  100% { transform: translateX(0); opacity: 0.6; }
 }
 
-@keyframes logoGlow {
-  0%, 100% { text-shadow: 0 0 20px rgba(200,149,26,0.3); }
-  50% { text-shadow: 0 0 40px rgba(200,149,26,0.6), 0 0 80px rgba(240,180,41,0.3); }
+.swipe-hint {
+  animation: swipeHint 1.5s ease-in-out infinite;
+}
+
+/* ── Card hover lift ──────────────────────────────────────────────── */
+.card-lift {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15),
+              0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.dark .card-lift:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4),
+              0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ── Section transition ───────────────────────────────────────────── */
+@keyframes sectionSlideIn {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.section-enter {
+  animation: sectionSlideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ── Pulse ring (live indicator) ──────────────────────────────────── */
+@keyframes pulseRing {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+.pulse-ring {
+  animation: pulseRing 1.5s ease-out infinite;
 }
 
 /* ── Masonry grid ─────────────────────────────────────────────────── */
@@ -210,6 +295,30 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
   border-radius: var(--radius-sm);
 }
 
+/* ── Progress bar sheen ────────────────────────────────────────────── */
+@keyframes progressSheen {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.progress-sheen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60px;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.8) 40%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.8) 60%,
+    transparent 100%
+  );
+  animation: progressSheen 0.8s ease-in-out infinite;
+  filter: blur(1px);
+}
+
 /* ── Reduced motion ───────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -218,4 +327,13 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ── Scrollbar none utility ───────────────────────────────────────── */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
