@@ -1,0 +1,57 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'webapp/**'
+      - '.github/workflows/build-apk.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        working-directory: webapp
+        run: npm ci
+
+      - name: Sync Capacitor
+        working-directory: webapp
+        run: npx cap sync android
+
+      - name: Build APK (Debug)
+        working-directory: webapp/android
+        run: chmod +x gradlew && ./gradlew assembleDebug
+
+      - name: Build APK (Release)
+        working-directory: webapp/android
+        run: ./gradlew assembleRelease
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: openclaude-web-debug
+          path: webapp/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: openclaude-web-release
+          path: webapp/android/app/build/outputs/apk/release/app-release-unsigned.apk
+          retention-days: 30

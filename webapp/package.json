@@ -1,0 +1,18 @@
+{
+  "name": "openclaude-web",
+  "version": "0.2.0",
+  "description": "OpenClaude Web — AI chat powered by Gitlawb Opengateway",
+  "type": "module",
+  "scripts": {
+    "build": "echo 'Static PHP app — no build needed'",
+    "cap:init": "npx cap init 'OpenClaude Web' com.etside.openclaude --web-dir .",
+    "cap:add:android": "npx cap add android",
+    "cap:sync": "npx cap sync",
+    "cap:build:android": "cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  }
+}
