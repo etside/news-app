@@ -1,4 +1,4 @@
-name: Build & Deploy Dhaka Heralds
+name: Build Dhaka Heralds
 
 on:
   push:
@@ -13,12 +13,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
 
 jobs:
   build:
@@ -38,34 +32,22 @@ jobs:
 
       - run: npm ci
 
-      - name: TypeScript check
-        run: npx tsc --noEmit
-
       - name: Build
-        run: npx vite build
+        run: npm run build
 
-      - name: Upload Pages artifact
-        if: github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dhaka-heralds/dist/
+      - name: Create Netlify zip
+        run: cd dist && zip -r ../dhaka-heralds-netlify.zip .
 
-      - name: Upload dist artifact (PR builds)
-        if: github.event_name == 'pull_request'
+      - name: Upload dist artifact
         uses: actions/upload-artifact@v4
         with:
           name: dhaka-heralds-dist
           path: dhaka-heralds/dist/
-          retention-days: 7
+          retention-days: 30
 
-  deploy:
-    if: github.event_name != 'pull_request'
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Upload Netlify zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dhaka-heralds-netlify
+          path: dhaka-heralds/dhaka-heralds-netlify.zip
+          retention-days: 30

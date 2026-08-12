@@ -1,0 +1,17 @@
+node_modules/
+dist/
+*.zip
+
+# Root media files (not used in build — articles use picsum.photos URLs)
+/*.jpg
+/*.png
+/*.gif
+/*.mp4
+/*.webp
+
+# Data exports (parsed data lives in src/data/)
+*.csv
+instagram_posts_export*.json
+
+# Local Netlify folder
+.netlify
