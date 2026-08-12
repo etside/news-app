@@ -26,6 +26,7 @@ reports/
 GEMINI.md
 CLAUDE.md
 package-lock.json
+!dhaka-heralds/package-lock.json
 /.claude
 # Local git worktrees created by agent/developer tooling.
 /.worktrees/
