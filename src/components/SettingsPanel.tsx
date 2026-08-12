@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLayout, LAYOUT_OPTIONS, type LayoutId } from '../contexts/LayoutContext';
+import { useAuth, type UserRole, ROLE_LABELS, ROLE_ICONS, ROLE_DESCRIPTIONS, ROLE_PERMISSIONS } from '../contexts/AuthContext';
 
 interface SettingsPanelProps {
   open: boolean;
@@ -29,9 +30,13 @@ function savePrefs(p: UserPrefs) {
   try { localStorage.setItem(PREFS_KEY, JSON.stringify(p)); } catch {}
 }
 
+const AVAILABLE_ROLES: UserRole[] = ['reader', 'editor', 'marketer', 'admin'];
+
 export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const { layout, setLayout } = useLayout();
+  const { role, setRole, permissions, roleLabel, roleIcon } = useAuth();
   const [prefs, setPrefs] = useState<UserPrefs>(loadPrefs);
+  const [showRoleInfo, setShowRoleInfo] = useState(false);
 
   useEffect(() => {
     if (open) setPrefs(loadPrefs());
@@ -58,6 +63,68 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
           </div>
+
+          {/* Role & Access */}
+          <Section title="Role & Access">
+            <button
+              onClick={() => setShowRoleInfo(!showRoleInfo)}
+              className="w-full p-3 rounded-xl bg-surface-2 border border-border hover:border-border-strong transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-xl">{roleIcon}</span>
+                <div className="flex-1 text-left">
+                  <h4 className="font-semibold text-sm">{roleLabel}</h4>
+                  <p className="text-text-muted text-xs">{ROLE_DESCRIPTIONS[role]}</p>
+                </div>
+                <svg
+                  width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                  className={`text-text-muted transition-transform ${showRoleInfo ? 'rotate-180' : ''}`}
+                >
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </div>
+            </button>
+
+            {showRoleInfo && (
+              <div className="mt-3 space-y-2">
+                {/* Permission grid */}
+                <div className="p-3 rounded-xl bg-surface border border-border">
+                  <h4 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2">Permissions</h4>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {Object.entries(permissions).map(([key, value]) => (
+                      <div key={key} className="flex items-center gap-1.5 text-xs">
+                        <span className={value ? 'text-green-500' : 'text-red-400'}>
+                          {value ? '✓' : '✗'}
+                        </span>
+                        <span className="text-text-muted">{key.replace(/([A-Z])/g, ' $1').toLowerCase()}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Role switcher */}
+                <div className="p-3 rounded-xl bg-surface border border-border">
+                  <h4 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2">Switch Role</h4>
+                  <div className="space-y-1.5">
+                    {AVAILABLE_ROLES.map(r => (
+                      <button
+                        key={r}
+                        onClick={() => setRole(r)}
+                        className={`w-full p-2 rounded-lg text-left transition-all text-xs ${
+                          role === r
+                            ? 'bg-gold/10 border border-gold text-gold'
+                            : 'bg-surface-2 border border-transparent hover:border-border text-text-secondary'
+                        }`}
+                      >
+                        <span className="mr-2">{ROLE_ICONS[r]}</span>
+                        {ROLE_LABELS[r]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </Section>
 
           {/* Layout Theme */}
           <Section title="Layout Theme">
@@ -121,6 +188,25 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             />
           </Section>
 
+          {/* Gesture Guide */}
+          <Section title="Gesture Navigation">
+            <div className="p-3 rounded-xl bg-surface border border-border">
+              <div className="space-y-2">
+                {[
+                  { gesture: 'Swipe Left/Right', action: 'Switch sections' },
+                  { gesture: 'Tap', action: 'Open article' },
+                  { gesture: 'Long Press', action: 'Save article' },
+                  { gesture: 'Pull Down', action: 'Refresh feed' },
+                ].map(g => (
+                  <div key={g.gesture} className="flex items-center justify-between text-xs">
+                    <span className="text-text-muted">{g.gesture}</span>
+                    <span className="text-text-secondary font-medium">{g.action}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Section>
+
           {/* Reset */}
           <div className="pt-4 border-t border-border">
             <button
@@ -128,6 +214,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                 localStorage.removeItem(PREFS_KEY);
                 localStorage.removeItem('dh-onboarding-done');
                 localStorage.removeItem('dh-layout-preference');
+                localStorage.removeItem('dh-user-role');
                 window.location.reload();
               }}
               className="w-full py-2.5 rounded-xl border border-red-500/30 text-red-500 text-sm font-medium hover:bg-red-500/10 transition-colors"

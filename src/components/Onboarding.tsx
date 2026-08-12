@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useLayout, LAYOUT_OPTIONS, type LayoutId } from '../contexts/LayoutContext';
+import { useAuth, type UserRole, ROLE_LABELS, ROLE_ICONS, ROLE_DESCRIPTIONS } from '../contexts/AuthContext';
 
 interface OnboardingProps {
   onDone: () => void;
 }
 
-type Step = 'welcome' | 'age' | 'personalize' | 'contact' | 'verify' | 'layout';
+type Step = 'welcome' | 'role' | 'age' | 'personalize' | 'contact' | 'verify' | 'gestures' | 'layout';
 
 const AGE_GROUPS = [
   { id: 'under-18', label: 'Under 18', icon: '📚' },
@@ -17,59 +18,61 @@ const AGE_GROUPS = [
 ];
 
 const FACT_CHECK_FEATURES = [
-  {
-    title: 'Source Verification',
-    desc: 'Every article links to primary sources so you can verify claims yourself.',
-    icon: '🔗',
-  },
-  {
-    title: 'Cross-Reference Alerts',
-    desc: 'When a story is reported differently across outlets, we flag it and show you all perspectives.',
-    icon: '⚖️',
-  },
-  {
-    title: 'Propaganda Detection',
-    desc: 'AI-powered analysis identifies emotionally charged language and potential bias in headlines.',
-    icon: '🛡️',
-  },
-  {
-    title: 'Verified Badge',
-    desc: 'Articles that pass our multi-step fact-check earn a verified badge you can trust.',
-    icon: '✅',
-  },
+  { title: 'Source Verification', desc: 'Every article links to primary sources so you can verify claims yourself.', icon: '🔗' },
+  { title: 'Cross-Reference Alerts', desc: 'When a story is reported differently across outlets, we flag it and show you all perspectives.', icon: '⚖️' },
+  { title: 'Propaganda Detection', desc: 'AI-powered analysis identifies emotionally charged language and potential bias in headlines.', icon: '🛡️' },
+  { title: 'Verified Badge', desc: 'Articles that pass our multi-step fact-check earn a verified badge you can trust.', icon: '✅' },
 ];
+
+const GESTURE_GUIDE = [
+  { gesture: 'Swipe Left', action: 'Next section', icon: '👈', desc: 'Move to the next news section (Analysis, Opinion, World, Tech)' },
+  { gesture: 'Swipe Right', action: 'Previous section', icon: '👉', desc: 'Go back to the previous news section' },
+  { gesture: 'Tap Article', action: 'Read full story', icon: '👆', desc: 'Open the article in full-screen reading mode' },
+  { gesture: 'Swipe Down', action: 'Refresh feed', icon: '👇', desc: 'Pull down to refresh the latest headlines' },
+  { gesture: 'Long Press', action: 'Save article', icon: '✊', desc: 'Long press on any article card to save it for later' },
+  { gesture: 'Pinch', action: 'Zoom content', icon: '🤏', desc: 'Pinch to zoom in/out on article images and cards' },
+];
+
+const AVAILABLE_ROLES: UserRole[] = ['reader', 'editor', 'marketer', 'admin'];
 
 export default function Onboarding({ onDone }: OnboardingProps) {
   const { setLayout } = useLayout();
+  const { setRole } = useAuth();
   const [step, setStep] = useState<Step>('welcome');
+  const [selectedRole, setSelectedRole] = useState<UserRole>('reader');
   const [age, setAge] = useState('');
   const [wantsPersonalization, setWantsPersonalization] = useState<boolean | null>(null);
   const [contact, setContact] = useState('');
   const [wantsVerification, setWantsVerification] = useState<boolean | null>(null);
   const [selectedLayout, setSelectedLayout] = useState<LayoutId>('default');
   const [contactType, setContactType] = useState<'email' | 'phone'>('email');
+  const [gesturesSeen, setGesturesSeen] = useState(false);
 
   const progress = {
     welcome: 0,
-    age: 20,
-    personalize: 40,
-    contact: 55,
-    verify: 75,
-    layout: 90,
+    role: 12,
+    age: 24,
+    personalize: 36,
+    contact: 48,
+    verify: 60,
+    gestures: 72,
+    layout: 88,
   }[step];
 
   const next = (s: Step) => setStep(s);
 
   const finish = () => {
     setLayout(selectedLayout);
-    // Store preferences
+    setRole(selectedRole);
     try {
       localStorage.setItem('dh-prefs', JSON.stringify({
+        role: selectedRole,
         age,
         personalization: wantsPersonalization,
         contact: wantsPersonalization ? contact : null,
         contactType: wantsPersonalization ? contactType : null,
         verification: wantsVerification,
+        gesturesSeen,
         layout: selectedLayout,
       }));
     } catch {}
@@ -92,12 +95,14 @@ export default function Onboarding({ onDone }: OnboardingProps) {
 
         {/* Step content */}
         <div className="section-enter" key={step}>
-          {step === 'welcome' && <WelcomeStep onNext={() => next('age')} />}
-          {step === 'age' && <AgeStep age={age} setAge={setAge} onNext={() => next('personalize')} onBack={() => next('welcome')} />}
+          {step === 'welcome' && <WelcomeStep onNext={() => next('role')} />}
+          {step === 'role' && <RoleStep selected={selectedRole} setSelected={setSelectedRole} onNext={() => next('age')} onBack={() => next('welcome')} />}
+          {step === 'age' && <AgeStep age={age} setAge={setAge} onNext={() => next('personalize')} onBack={() => next('role')} />}
           {step === 'personalize' && <PersonalizeStep choice={wantsPersonalization} setChoice={setWantsPersonalization} onNext={() => next(wantsPersonalization ? 'contact' : 'verify')} onBack={() => next('age')} />}
           {step === 'contact' && <ContactStep contact={contact} setContact={setContact} contactType={contactType} setContactType={setContactType} onNext={() => next('verify')} onBack={() => next('personalize')} />}
-          {step === 'verify' && <VerifyStep choice={wantsVerification} setChoice={setWantsVerification} onNext={() => next('layout')} onBack={() => next(wantsPersonalization ? 'contact' : 'personalize')} />}
-          {step === 'layout' && <LayoutStep selected={selectedLayout} setSelected={setSelectedLayout} onNext={finish} onBack={() => next('verify')} />}
+          {step === 'verify' && <VerifyStep choice={wantsVerification} setChoice={setWantsVerification} onNext={() => next('gestures')} onBack={() => next(wantsPersonalization ? 'contact' : 'personalize')} />}
+          {step === 'gestures' && <GestureStep seen={gesturesSeen} setSeen={setGesturesSeen} onNext={() => next('layout')} onBack={() => next('verify')} />}
+          {step === 'layout' && <LayoutStep selected={selectedLayout} setSelected={setSelectedLayout} onNext={finish} onBack={() => next('gestures')} />}
         </div>
       </div>
     </div>
@@ -108,8 +113,12 @@ export default function Onboarding({ onDone }: OnboardingProps) {
 function WelcomeStep({ onNext }: { onNext: () => void }) {
   return (
     <div className="text-center">
-      <div className="w-16 h-16 rounded-full bg-white mx-auto mb-5 flex items-center justify-center" style={{ boxShadow: '0 0 24px rgba(255,255,255,0.15)' }}>
-        <span className="font-headline font-bold text-[#0A0A0C] text-xl">DH</span>
+      <div className="w-20 h-20 mx-auto mb-5 rounded-xl overflow-hidden" style={{ boxShadow: '0 0 32px rgba(232,168,32,0.2)' }}>
+        <img
+          src={`${import.meta.env.BASE_URL}logo.webp`}
+          alt="Dhaka Heralds"
+          className="w-full h-full object-cover"
+        />
       </div>
       <h1 className="font-headline text-3xl font-bold mb-3">Welcome to Dhaka Heralds</h1>
       <p className="text-text-secondary text-sm leading-relaxed mb-6 max-w-md mx-auto">
@@ -141,7 +150,47 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
   );
 }
 
-/* ── Step 2: Age ─────────────────────────────────────────────────── */
+/* ── Step 2: Role Selection ──────────────────────────────────────── */
+function RoleStep({ selected, setSelected, onNext, onBack }: { selected: UserRole; setSelected: (r: UserRole) => void; onNext: () => void; onBack: () => void }) {
+  return (
+    <div className="text-center">
+      <h2 className="font-headline text-2xl font-bold mb-2">Your Role</h2>
+      <p className="text-text-secondary text-sm mb-6">Select your access level to customize the features you can use.</p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+        {AVAILABLE_ROLES.map(role => (
+          <button
+            key={role}
+            onClick={() => setSelected(role)}
+            className={`p-4 rounded-xl text-left transition-all border-2 ${
+              selected === role
+                ? 'border-gold bg-surface-2'
+                : 'border-border bg-surface hover:border-border-strong'
+            }`}
+          >
+            <div className="text-2xl mb-2">{ROLE_ICONS[role]}</div>
+            <h3 className="font-semibold text-sm mb-1">{ROLE_LABELS[role]}</h3>
+            <p className="text-text-muted text-xs leading-relaxed">{ROLE_DESCRIPTIONS[role]}</p>
+          </button>
+        ))}
+      </div>
+
+      <div className="flex items-center justify-center gap-3">
+        <button onClick={onBack} className="px-5 py-2.5 rounded-full border border-border text-text-secondary text-sm hover:bg-surface-2 transition-colors">
+          Back
+        </button>
+        <button
+          onClick={onNext}
+          className="px-8 py-2.5 bg-gold text-black font-semibold rounded-full transition-colors"
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ── Step 3: Age ─────────────────────────────────────────────────── */
 function AgeStep({ age, setAge, onNext, onBack }: { age: string; setAge: (a: string) => void; onNext: () => void; onBack: () => void }) {
   return (
     <div className="text-center">
@@ -181,7 +230,7 @@ function AgeStep({ age, setAge, onNext, onBack }: { age: string; setAge: (a: str
   );
 }
 
-/* ── Step 3: Personalization ─────────────────────────────────────── */
+/* ── Step 4: Personalization ─────────────────────────────────────── */
 function PersonalizeStep({ choice, setChoice, onNext, onBack }: { choice: boolean | null; setChoice: (c: boolean) => void; onNext: () => void; onBack: () => void }) {
   return (
     <div className="text-center">
@@ -234,7 +283,7 @@ function PersonalizeStep({ choice, setChoice, onNext, onBack }: { choice: boolea
   );
 }
 
-/* ── Step 4: Contact (only if personalization = yes) ─────────────── */
+/* ── Step 5: Contact ─────────────────────────────────────────────── */
 function ContactStep({ contact, setContact, contactType, setContactType, onNext, onBack }: {
   contact: string; setContact: (c: string) => void;
   contactType: 'email' | 'phone'; setContactType: (t: 'email' | 'phone') => void;
@@ -251,7 +300,6 @@ function ContactStep({ contact, setContact, contactType, setContactType, onNext,
         Where should we send your personalized daily briefing?
       </p>
 
-      {/* Type toggle */}
       <div className="flex items-center justify-center gap-2 mb-6">
         <button
           onClick={() => setContactType('email')}
@@ -294,18 +342,12 @@ function ContactStep({ contact, setContact, contactType, setContactType, onNext,
         >
           Continue
         </button>
-        <button
-          onClick={onNext}
-          className="px-4 py-2.5 text-text-muted text-sm hover:text-text-secondary transition-colors"
-        >
-          Skip
-        </button>
       </div>
     </div>
   );
 }
 
-/* ── Step 5: Fact-Checking / Verification ────────────────────────── */
+/* ── Step 6: Fact-Checking / Verification ────────────────────────── */
 function VerifyStep({ choice, setChoice, onNext, onBack }: { choice: boolean | null; setChoice: (c: boolean) => void; onNext: () => void; onBack: () => void }) {
   return (
     <div className="text-center">
@@ -368,7 +410,76 @@ function VerifyStep({ choice, setChoice, onNext, onBack }: { choice: boolean | n
   );
 }
 
-/* ── Step 6: Layout Selection ────────────────────────────────────── */
+/* ── Step 7: Gesture Education ───────────────────────────────────── */
+function GestureStep({ seen, setSeen, onNext, onBack }: { seen: boolean; setSeen: (v: boolean) => void; onNext: () => void; onBack: () => void }) {
+  const [demoActive, setDemoActive] = useState<number | null>(null);
+
+  return (
+    <div className="text-center">
+      <h2 className="font-headline text-2xl font-bold mb-2">Gesture Navigation</h2>
+      <p className="text-text-secondary text-sm mb-6">
+        Navigate Dhaka Heralds with intuitive touch gestures. Try each one to see it in action.
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6 text-left">
+        {GESTURE_GUIDE.map((g, i) => (
+          <button
+            key={g.gesture}
+            onClick={() => {
+              setDemoActive(i);
+              setTimeout(() => setDemoActive(null), 1500);
+              setSeen(true);
+            }}
+            className={`p-4 rounded-xl transition-all border-2 ${
+              demoActive === i
+                ? 'border-gold bg-gold/10 scale-[1.02]'
+                : 'border-border bg-surface hover:border-border-strong'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className={`text-2xl transition-transform ${demoActive === i ? 'animate-bounce' : ''}`}>
+                {g.icon}
+              </div>
+              <div className="flex-1 text-left">
+                <h3 className="font-semibold text-sm">{g.gesture}</h3>
+                <p className="text-gold text-xs font-medium">{g.action}</p>
+                <p className="text-text-muted text-xs leading-relaxed mt-1">{g.desc}</p>
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* Demo area */}
+      <div className="relative h-16 rounded-xl bg-surface-2 border border-border mb-6 overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center">
+          {demoActive !== null ? (
+            <div className="flex items-center gap-2 text-gold font-medium text-sm animate-pulse">
+              <span>{GESTURE_GUIDE[demoActive].icon}</span>
+              <span>{GESTURE_GUIDE[demoActive].gesture} → {GESTURE_GUIDE[demoActive].action}</span>
+            </div>
+          ) : (
+            <span className="text-text-muted text-sm">Tap a gesture above to see it in action</span>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-center gap-3">
+        <button onClick={onBack} className="px-5 py-2.5 rounded-full border border-border text-text-secondary text-sm hover:bg-surface-2 transition-colors">
+          Back
+        </button>
+        <button
+          onClick={onNext}
+          className="px-8 py-2.5 bg-gold text-black font-semibold rounded-full transition-colors"
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ── Step 8: Layout Selection ────────────────────────────────────── */
 function LayoutStep({ selected, setSelected, onNext, onBack }: { selected: LayoutId; setSelected: (l: LayoutId) => void; onNext: () => void; onBack: () => void }) {
   return (
     <div className="text-center">

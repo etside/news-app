@@ -4,6 +4,7 @@ import SplashScreen from './components/SplashScreen';
 import Onboarding from './components/Onboarding';
 import SettingsPanel from './components/SettingsPanel';
 import { LayoutProvider, useLayout } from './contexts/LayoutContext';
+import { AuthProvider } from './contexts/AuthContext';
 import LayoutOne from './components/layouts/LayoutOne';
 import LayoutTwo from './components/layouts/LayoutTwo';
 import LayoutThree from './components/layouts/LayoutThree';
@@ -89,17 +90,19 @@ export default function App() {
 
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-      <LayoutProvider>
-        <div className="min-h-screen bg-background text-text-primary">
-          {showSplash ? (
-            <SplashScreen onDone={handleSplashDone} />
-          ) : showOnboarding ? (
-            <Onboarding onDone={handleOnboardingDone} />
-          ) : (
-            <LayoutRouter />
-          )}
-        </div>
-      </LayoutProvider>
+      <AuthProvider>
+        <LayoutProvider>
+          <div className="min-h-screen bg-background text-text-primary">
+            {showSplash ? (
+              <SplashScreen onDone={handleSplashDone} />
+            ) : showOnboarding ? (
+              <Onboarding onDone={handleOnboardingDone} />
+            ) : (
+              <LayoutRouter />
+            )}
+          </div>
+        </LayoutProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

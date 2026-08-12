@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTheme } from 'next-themes';
 import TopProgressBar from '../shared/TopProgressBar';
+import DhLogo from '../shared/DhLogo';
 import EmbedCard from '../EmbedCard';
 import OwnershipBadge from '../OwnershipBadge';
 import { ARTICLES, SECTIONS, type Section, type Article, type Urgency } from '../../data/articles';
@@ -73,9 +74,7 @@ export default function LayoutFive() {
       <header className="sticky top-0 z-40 bg-white border-b border-black/5">
         <div className="flex items-center justify-between px-4 h-14">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#0A0A0C] flex items-center justify-center">
-              <span className="font-headline font-bold text-white text-xs">DH</span>
-            </div>
+            <DhLogo size="md" />
             <div>
               <span className="font-headline text-base font-bold text-[#0A0A0C] leading-none block">Dhaka Heralds</span>
               <span className="text-[10px] text-[#8A8A84] uppercase tracking-widest">Analysis</span>
@@ -128,9 +127,20 @@ export default function LayoutFive() {
 
       {/* Feed */}
       <main className="px-4 py-4 pb-24">
-        {/* Hero Article */}
+        {/* Hero Article with borderPhone decoration */}
         {filtered[0] && (
-          <HeroCard article={filtered[0]} onOpen={() => openDetail(filtered[0])} />
+          <div className="relative">
+            <HeroCard article={filtered[0]} onOpen={() => openDetail(filtered[0])} />
+            {/* Sheen border decoration */}
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[80%] h-4 opacity-20 pointer-events-none">
+              <img
+                src={`${import.meta.env.BASE_URL}borderPhone.webp`}
+                alt=""
+                className="w-full h-full object-cover"
+                style={{ filter: 'blur(2px)' }}
+              />
+            </div>
+          </div>
         )}
 
         {/* Remaining articles */}
