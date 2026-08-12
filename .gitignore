@@ -41,5 +41,13 @@ plan/
 .tmp-*
 temp_reference/
 
+# Standalone projects (each has its own .git repo)
+salesdaddy/
+sunjida-cloned/
+sunjida/
+veronica/
+wear-impressive/
+webapp/
+
 # Local Netlify folder
 .netlify
