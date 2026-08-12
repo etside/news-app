@@ -9,7 +9,7 @@ import LayoutTwo from './components/layouts/LayoutTwo';
 import LayoutThree from './components/layouts/LayoutThree';
 import LayoutFour from './components/layouts/LayoutFour';
 
-const ONBOARDING_KEY = 'dh-onboarding-done';
+const ONBOARDING_KEY = 'dh-onboarding-v2';
 
 function LayoutRouter() {
   const { layout } = useLayout();
