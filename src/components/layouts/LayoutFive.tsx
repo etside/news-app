@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useTheme } from 'next-themes';
+import { useState, useEffect } from 'react';
+import { useTheme } from '../../lib/theme';
 import TopProgressBar from '../shared/TopProgressBar';
 import DhLogo from '../shared/DhLogo';
 import EmbedCard from '../EmbedCard';
@@ -18,7 +18,7 @@ export default function LayoutFive() {
   const [activeSection, setActiveSection] = useState<Section>('home');
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  useState(() => { setTimeout(() => setMounted(true), 0); });
+  useEffect(() => { setTimeout(() => setMounted(true), 0); }, []);
 
   const filtered = activeCategory === 'Trending'
     ? ARTICLES

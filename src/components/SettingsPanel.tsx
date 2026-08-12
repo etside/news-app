@@ -212,7 +212,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             <button
               onClick={() => {
                 localStorage.removeItem(PREFS_KEY);
-                localStorage.removeItem('dh-onboarding-done');
+                localStorage.removeItem('dh-onboarding-v2');
                 localStorage.removeItem('dh-layout-preference');
                 localStorage.removeItem('dh-user-role');
                 window.location.reload();

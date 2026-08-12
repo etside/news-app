@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useTheme } from 'next-themes';
+import { useTheme } from '../../lib/theme';
 
 interface DhLogoProps {
   size?: 'sm' | 'md' | 'lg';

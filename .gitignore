@@ -11,3 +11,6 @@ dist/
 # Data exports (parsed data lives in src/data/)
 *.csv
 instagram_posts_export*.json
+
+# Local Netlify folder
+.netlify

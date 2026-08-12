@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
-import { useTheme } from 'next-themes';
+import { useTheme } from '../../lib/theme';
 import DhLogo from './DhLogo';
 import SectionIcon from './SectionIcon';
 import type { Section } from '../../data/articles';

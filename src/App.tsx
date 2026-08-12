@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { ThemeProvider } from 'next-themes';
+import { ThemeProvider } from './lib/theme';
 import SplashScreen from './components/SplashScreen';
 import Onboarding from './components/Onboarding';
 import SettingsPanel from './components/SettingsPanel';
