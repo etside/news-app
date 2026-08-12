@@ -2,6 +2,7 @@ import { useState } from 'react';
 import GestureNav from '../shared/GestureNav';
 import UrgencyBadge from '../shared/UrgencyBadge';
 import TopProgressBar from '../shared/TopProgressBar';
+import EmbedCard from '../EmbedCard';
 import { ARTICLES, CATEGORIES, SECTIONS, type Section, type Article } from '../../data/articles';
 
 export default function LayoutOne() {
@@ -59,7 +60,20 @@ export default function LayoutOne() {
         {/* Masonry grid */}
         <div className="masonry-grid mt-6">
           {filtered.map(article => (
-            <ArticleCard key={article.id} article={article} />
+            article.embedUrl ? (
+              <div key={article.id} className="masonry-item">
+                <EmbedCard
+                  embedUrl={article.embedUrl}
+                  thumbnailUrl={article.image}
+                  mediaType={article.mediaType || 'image'}
+                  owner={article.owner!}
+                  engagement={article.engagement || { likes: 0, comments: 0 }}
+                  caption={article.excerpt}
+                />
+              </div>
+            ) : (
+              <ArticleCard key={article.id} article={article} />
+            )
           ))}
         </div>
       </GestureNav>

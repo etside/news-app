@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useTheme } from 'next-themes';
 import TopProgressBar from '../shared/TopProgressBar';
+import EmbedCard from '../EmbedCard';
+import OwnershipBadge from '../OwnershipBadge';
 import { ARTICLES, SECTIONS, type Section, type Article, type Urgency } from '../../data/articles';
 
-const CATEGORIES = ['Trending', 'Health', 'Sports', 'Finance', 'Politics', 'Tech', 'Culture', 'World'];
+const CATEGORIES = ['Trending', 'Health', 'Sports', 'Finance', 'Politics', 'Tech', 'Culture', 'World', 'Business'];
 
 type View = 'feed' | 'saved' | 'detail';
 
@@ -134,13 +136,25 @@ export default function LayoutFive() {
         {/* Remaining articles */}
         <div className="mt-4 space-y-3">
           {filtered.slice(1).map(article => (
-            <CompactCard
-              key={article.id}
-              article={article}
-              onOpen={() => openDetail(article)}
-              isSaved={savedIds.has(article.id)}
-              onToggleSave={() => toggleSave(article.id)}
-            />
+            article.embedUrl ? (
+              <EmbedCard
+                key={article.id}
+                embedUrl={article.embedUrl}
+                thumbnailUrl={article.image}
+                mediaType={article.mediaType || 'image'}
+                owner={article.owner!}
+                engagement={article.engagement || { likes: 0, comments: 0 }}
+                caption={article.excerpt}
+              />
+            ) : (
+              <CompactCard
+                key={article.id}
+                article={article}
+                onOpen={() => openDetail(article)}
+                isSaved={savedIds.has(article.id)}
+                onToggleSave={() => toggleSave(article.id)}
+              />
+            )
           ))}
         </div>
       </main>
@@ -176,8 +190,21 @@ export default function LayoutFive() {
 function HeroCard({ article, onOpen }: { article: Article; onOpen: () => void }) {
   return (
     <article onClick={onOpen} className="rounded-2xl overflow-hidden bg-white border border-black/5 cursor-pointer group" style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-      <div className="overflow-hidden">
+      <div className="overflow-hidden relative">
         <img src={article.image} alt="" className="w-full h-56 sm:h-72 object-cover group-hover:scale-105 transition-transform duration-500" />
+        {article.embedUrl && (
+          <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/50 backdrop-blur-sm">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="white" strokeWidth="2"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" fill="none" stroke="white" strokeWidth="1.5"/><circle cx="17.5" cy="6.5" r="1.5" fill="white"/></svg>
+            <span className="text-[10px] font-medium text-white">Instagram</span>
+          </div>
+        )}
+        {article.mediaType === 'video' && (
+          <div className="absolute bottom-3 right-3">
+            <div className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+          </div>
+        )}
       </div>
       <div className="p-4">
         <div className="flex items-center gap-2 mb-2">
@@ -189,8 +216,12 @@ function HeroCard({ article, onOpen }: { article: Article; onOpen: () => void })
           {article.title}
         </h2>
         <p className="text-sm text-[#4A4A44] leading-relaxed line-clamp-2">{article.excerpt}</p>
-        <AuthorMeta />
-        <EngagementBar />
+        {article.owner ? (
+          <OwnershipBadge owner={article.owner} timestamp={article.time} />
+        ) : (
+          <AuthorMeta />
+        )}
+        <EngagementBar likes={article.engagement?.likes} comments={article.engagement?.comments} />
       </div>
     </article>
   );
@@ -204,12 +235,22 @@ function CompactCard({ article, onOpen, isSaved, onToggleSave }: { article: Arti
         <div className="flex items-center gap-2 mb-1">
           <LiveBadge urgency={article.urgency} />
           <span className="text-[10px] text-[#8A8A84] uppercase tracking-wider font-medium">{article.category}</span>
+          {article.embedUrl && (
+            <span className="text-[10px] text-[#3897F0] font-medium flex items-center gap-0.5">
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="#3897F0"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="currentColor" strokeWidth="2"/></svg>
+              IG
+            </span>
+          )}
         </div>
         <h3 className="font-headline text-sm font-bold text-[#0A0A0C] leading-snug line-clamp-2 mb-1">
           {article.title}
         </h3>
         <div className="flex items-center justify-between">
-          <span className="text-[10px] text-[#8A8A84]">{article.time}</span>
+          {article.owner ? (
+            <OwnershipBadge owner={article.owner} timestamp={article.time} compact />
+          ) : (
+            <span className="text-[10px] text-[#8A8A84]">{article.time}</span>
+          )}
           <button
             onClick={e => { e.stopPropagation(); onToggleSave(); }}
             className="p-1 rounded-full hover:bg-[#F0EFE8] transition-colors"
@@ -240,7 +281,7 @@ function LiveBadge({ urgency }: { urgency: Urgency }) {
   );
 }
 
-/* ── Author Meta ────────────────────────────────────────────────── */
+/* ── Author Meta (editorial) ────────────────────────────────────── */
 function AuthorMeta() {
   return (
     <div className="flex items-center justify-between mt-3 pt-3 border-t border-black/5">
@@ -250,31 +291,34 @@ function AuthorMeta() {
         </div>
         <div>
           <span className="text-xs font-semibold text-[#0A0A0C] block leading-none">Dhaka Heralds</span>
-          <span className="text-[10px] text-[#8A8A84]">2h ago</span>
+          <span className="text-[10px] text-[#8A8A84]">Editorial</span>
         </div>
       </div>
-      <button className="px-3 py-1 rounded-full bg-[#F0EFE8] text-[10px] font-semibold text-[#0A0A0C] hover:bg-[#E4E3DA] transition-colors">
+      <span className="px-3 py-1 rounded-full bg-[#F0EFE8] text-[10px] font-semibold text-[#0A0A0C]">
         Follow
-      </button>
+      </span>
     </div>
   );
 }
 
 /* ── Engagement Bar ─────────────────────────────────────────────── */
-function EngagementBar() {
+function EngagementBar({ likes, comments }: { likes?: number; comments?: number }) {
   const [upvoted, setUpvoted] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
+
+  const displayLikes = likes !== undefined ? (upvoted ? likes + 1 : likes) : (upvoted ? 25 : 24);
+  const displayComments = comments !== undefined ? comments : 12;
 
   return (
     <div className="flex items-center justify-between mt-3 pt-3 border-t border-black/5">
       <div className="flex items-center gap-4">
         <button onClick={() => setUpvoted(!upvoted)} className="flex items-center gap-1 text-[#4A4A44] hover:text-[#0A0A0C] transition-colors">
           <svg width="16" height="16" viewBox="0 0 24 24" fill={upvoted ? '#0A0A0C' : 'none'} stroke="currentColor" strokeWidth="2"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/><path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>
-          <span className="text-xs font-medium">{upvoted ? '25' : '24'}</span>
+          <span className="text-xs font-medium">{displayLikes}</span>
         </button>
         <button className="flex items-center gap-1 text-[#4A4A44] hover:text-[#0A0A0C] transition-colors">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-          <span className="text-xs font-medium">12</span>
+          <span className="text-xs font-medium">{displayComments}</span>
         </button>
         <button className="text-[#4A4A44] hover:text-[#0A0A0C] transition-colors">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
@@ -319,27 +363,52 @@ function ArticleDetail({ article, onBack, isSaved, onToggleSave }: { article: Ar
           {article.title}
         </h1>
 
-        <AuthorMeta />
+        {/* Ownership attribution */}
+        {article.owner ? (
+          <OwnershipBadge owner={article.owner} timestamp={article.time} />
+        ) : (
+          <AuthorMeta />
+        )}
 
         <p className="text-[15px] text-[#4A4A44] leading-relaxed mt-5">
           {article.excerpt}
         </p>
-        <p className="text-[15px] text-[#4A4A44] leading-relaxed mt-4">
-          The implications of this development extend far beyond immediate headlines. Analysts suggest this could reshape how citizens engage with governance and technology in the coming decade, marking a pivotal moment in the nation's digital transformation journey.
-        </p>
-        <p className="text-[15px] text-[#4A4A44] leading-relaxed mt-4">
-          Stakeholders from various sectors have expressed optimism while also calling for careful implementation to ensure equitable access across all demographics. The government has pledged to establish oversight mechanisms to monitor progress and address concerns transparently.
-        </p>
 
-        {/* Inline image */}
-        <div className="mt-6 rounded-2xl overflow-hidden">
-          <img src={article.image} alt="" className="w-full h-48 sm:h-64 object-cover" />
-          <p className="text-[10px] text-[#8A8A84] mt-2 text-center">Photo: Dhaka Heralds / File</p>
-        </div>
+        {/* Embed card for Instagram content */}
+        {article.embedUrl && (
+          <div className="mt-5">
+            <EmbedCard
+              embedUrl={article.embedUrl}
+              thumbnailUrl={article.image}
+              mediaType={article.mediaType || 'image'}
+              owner={article.owner!}
+              engagement={article.engagement || { likes: 0, comments: 0 }}
+              caption={article.excerpt}
+            />
+          </div>
+        )}
 
-        <p className="text-[15px] text-[#4A4A44] leading-relaxed mt-4">
-          As the story continues to develop, Dhaka Heralds will provide real-time updates and expert analysis to keep you informed. Stay tuned for comprehensive coverage of this evolving situation.
-        </p>
+        {/* Article body (editorial only) */}
+        {!article.embedUrl && (
+          <>
+            <p className="text-[15px] text-[#4A4A44] leading-relaxed mt-4">
+              The implications of this development extend far beyond immediate headlines. Analysts suggest this could reshape how citizens engage with governance and technology in the coming decade, marking a pivotal moment in the nation's digital transformation journey.
+            </p>
+            <p className="text-[15px] text-[#4A4A44] leading-relaxed mt-4">
+              Stakeholders from various sectors have expressed optimism while also calling for careful implementation to ensure equitable access across all demographics. The government has pledged to establish oversight mechanisms to monitor progress and address concerns transparently.
+            </p>
+
+            {/* Inline image */}
+            <div className="mt-6 rounded-2xl overflow-hidden">
+              <img src={article.image} alt="" className="w-full h-48 sm:h-64 object-cover" />
+              <p className="text-[10px] text-[#8A8A84] mt-2 text-center">Photo: Dhaka Heralds / File</p>
+            </div>
+
+            <p className="text-[15px] text-[#4A4A44] leading-relaxed mt-4">
+              As the story continues to develop, Dhaka Heralds will provide real-time updates and expert analysis to keep you informed. Stay tuned for comprehensive coverage of this evolving situation.
+            </p>
+          </>
+        )}
       </article>
 
       {/* Floating engagement bar */}
@@ -347,11 +416,11 @@ function ArticleDetail({ article, onBack, isSaved, onToggleSave }: { article: Ar
         <div className="flex items-center justify-around h-14 max-w-lg mx-auto px-4">
           <button className="flex flex-col items-center gap-0.5 text-[#4A4A44]">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/><path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>
-            <span className="text-[10px] font-medium">24</span>
+            <span className="text-[10px] font-medium">{article.engagement?.likes ?? 24}</span>
           </button>
           <button className="flex flex-col items-center gap-0.5 text-[#4A4A44]">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10z"/><path d="M17 2h3a2 2 0 012 2v7a2 2 0 01-2 2h-3"/></svg>
-            <span className="text-[10px] font-medium">3</span>
+            <span className="text-[10px] font-medium">{article.engagement?.comments ?? 3}</span>
           </button>
           <button className="flex flex-col items-center gap-0.5 text-[#4A4A44]">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>

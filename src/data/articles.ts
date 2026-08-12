@@ -10,9 +10,22 @@ export interface Article {
   time: string;
   urgency: Urgency;
   featured?: boolean;
+  // Extended fields for embed/ownership support
+  embedUrl?: string;
+  mediaType?: 'video' | 'image';
+  owner?: {
+    name: string;
+    handle: string;
+    avatar: string;
+    verified: boolean;
+    website: string;
+  };
+  engagement?: { likes: number; comments: number };
+  sourceId?: string;
 }
 
-export const ARTICLES: Article[] = [
+// Existing editorial articles (Dhaka Heralds staff)
+const EDITORIAL_ARTICLES: Article[] = [
   { id: 1, category: 'Politics', title: 'Bangladesh Parliament Approves New Digital Governance Bill', excerpt: 'The landmark legislation aims to digitize all government services by 2028, making Bangladesh a leader in South Asian e-governance.', image: 'https://picsum.photos/seed/dhaka1/600/400', time: '2h ago', urgency: 'breaking', featured: true },
   { id: 2, category: 'Economy', title: 'Dhaka Stock Exchange Hits Record High Amid Foreign Investment Surge', excerpt: 'Foreign direct investment reaches $4.2 billion in the first half of 2026.', image: 'https://picsum.photos/seed/dhaka2/600/350', time: '3h ago', urgency: 'high' },
   { id: 3, category: 'Technology', title: 'Bangladeshi Startup Raises $50M Series B for AI-Powered Agriculture', excerpt: 'The Dhaka-based company uses satellite imagery and AI to help farmers optimize crop yields.', image: 'https://picsum.photos/seed/dhaka3/600/500', time: '4h ago', urgency: 'normal' },
@@ -27,7 +40,14 @@ export const ARTICLES: Article[] = [
   { id: 12, category: 'Culture', title: 'Pohela Boishakh Celebrations Draw Millions to Ramna Batamul', excerpt: 'The Bengali New Year is marked by music, art, and traditional cuisine.', image: 'https://picsum.photos/seed/dhaka12/600/360', time: '1d ago', urgency: 'low' },
 ];
 
-export const CATEGORIES = ['All', 'Politics', 'Economy', 'Technology', 'Sports', 'Culture', 'Environment', 'Health', 'Education'];
+// Instagram embed articles (real content with ownership)
+import { getInstagramArticles } from './instagramPosts';
+const INSTAGRAM_ARTICLES = getInstagramArticles();
+
+// Merged feed: editorial first, then Instagram embeds
+export const ARTICLES: Article[] = [...EDITORIAL_ARTICLES, ...INSTAGRAM_ARTICLES];
+
+export const CATEGORIES = ['All', 'Politics', 'Economy', 'Technology', 'Sports', 'Culture', 'Environment', 'Health', 'Education', 'Business', 'Digital'];
 
 export const SECTIONS: { key: Section; label: string }[] = [
   { key: 'home', label: 'Home' },

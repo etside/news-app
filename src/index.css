@@ -337,3 +337,43 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
+/* ── Embed card styles ───────────────────────────────────────────── */
+.embed-card {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.embed-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1),
+              0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.dark .embed-card {
+  background: var(--surface);
+  border-color: var(--glass-border);
+}
+
+.dark .embed-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3),
+              0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.embed-card a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ── Ownership badge glow ────────────────────────────────────────── */
+.ownership-badge {
+  background: linear-gradient(135deg, rgba(56, 151, 240, 0.06), rgba(131, 58, 180, 0.06));
+  border: 1px solid rgba(56, 151, 240, 0.12);
+  border-radius: 9999px;
+  padding: 2px 8px;
+}
+
+.dark .ownership-badge {
+  background: linear-gradient(135deg, rgba(56, 151, 240, 0.12), rgba(131, 58, 180, 0.12));
+  border-color: rgba(56, 151, 240, 0.2);
+}
