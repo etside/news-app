@@ -8,6 +8,7 @@ import LayoutOne from './components/layouts/LayoutOne';
 import LayoutTwo from './components/layouts/LayoutTwo';
 import LayoutThree from './components/layouts/LayoutThree';
 import LayoutFour from './components/layouts/LayoutFour';
+import LayoutFive from './components/layouts/LayoutFive';
 
 const ONBOARDING_KEY = 'dh-onboarding-v2';
 
@@ -32,6 +33,7 @@ function LayoutRouter() {
     'high-contrast': <LayoutTwo />,
     'topics': <LayoutThree />,
     'cinematic': <LayoutFour />,
+    'gesture': <LayoutFive />,
   };
 
   return (

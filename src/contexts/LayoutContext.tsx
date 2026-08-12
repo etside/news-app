@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
-export type LayoutId = 'default' | 'high-contrast' | 'topics' | 'cinematic';
+export type LayoutId = 'default' | 'high-contrast' | 'topics' | 'cinematic' | 'gesture';
 
 interface LayoutOption {
   id: LayoutId;
@@ -33,6 +33,12 @@ export const LAYOUT_OPTIONS: LayoutOption[] = [
     name: 'Cinematic',
     description: 'Immersive dark theme with movie-style poster cards for top headlines',
     preview: '🎬',
+  },
+  {
+    id: 'gesture',
+    name: 'Gesture Headlines',
+    description: 'Mobile-app style with hero cards, engagement bar, and saved news',
+    preview: '📱',
   },
 ];
 
