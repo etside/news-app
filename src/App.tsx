@@ -15,11 +15,32 @@ import LayoutFive from './components/layouts/LayoutFive';
 
 const ONBOARDING_KEY = 'dh-onboarding-v2';
 
+// SPA redirect handler for GitHub Pages
+// 404.html redirects to index.html?/path — we parse that and navigate
+function useGitHubPagesRedirect() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const search = window.location.search;
+    if (search && search.startsWith('?/')) {
+      const redirectPath = search
+        .slice(1)                          // remove '?'
+        .replace(/~and~/g, '&')            // undo & encoding
+        .replace(/~plus~/g, '+');          // undo + encoding (if used)
+      // Clean up the URL without triggering a navigation loop
+      window.history.replaceState({}, '', redirectPath);
+      navigate(redirectPath, { replace: true });
+    }
+  }, [navigate]);
+}
+
 function LayoutRouter() {
   const { layout } = useLayout();
   const [showSettings, setShowSettings] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Handle GitHub Pages SPA redirect (404.html -> ?/path)
+  useGitHubPagesRedirect();
 
   // Listen for settings toggle from keyboard shortcut
   useEffect(() => {

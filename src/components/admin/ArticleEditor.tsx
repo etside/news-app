@@ -56,6 +56,7 @@ export default function ArticleEditor({ onSave, onCancel, editId }: ArticleEdito
   const [image, setImage] = useState(existing?.image || '');
   const [urgency, setUrgency] = useState<PostArticle['urgency']>(existing?.urgency || 'normal');
   const [showPreview, setShowPreview] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const canPublish = role === 'admin' || role === 'editor';
   const canDraft = role === 'admin' || role === 'editor' || role === 'marketer';
@@ -81,6 +82,7 @@ export default function ArticleEditor({ onSave, onCancel, editId }: ArticleEdito
     if (idx >= 0) all[idx] = article;
     else all.unshift(article);
     savePosts(all);
+    setSaved(true);
     onSave();
   };
 
@@ -222,7 +224,7 @@ export default function ArticleEditor({ onSave, onCancel, editId }: ArticleEdito
               <span>Posting as</span>
               <span className="font-medium text-text-secondary">{roleLabel}</span>
               <span className="ml-auto text-text-muted">
-                {status === 'draft' ? 'Draft' : 'Ready to publish'}
+                {saved ? 'Saved' : 'Ready to publish'}
               </span>
             </div>
           </div>
