@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 
 export default function TopProgressBar() {
-  const [loaded, setLoaded] = useState(false);
-  const [scrollPct, setScrollPct] = useState(0);
+  const [loadPct, setLoadPct] = useState(0);
+  const [ready, setReady] = useState(false);
+  const [scrollPct, setScrollPct] = useState(100);
 
   // Phase 1: load animation 0→100%
   useEffect(() => {
@@ -15,15 +16,16 @@ export default function TopProgressBar() {
     ];
     const timers: ReturnType<typeof setTimeout>[] = [];
     steps.forEach(({ p, d }) => {
-      timers.push(setTimeout(() => setScrollPct(p), d));
+      timers.push(setTimeout(() => setLoadPct(p), d));
     });
-    timers.push(setTimeout(() => setLoaded(true), 1000));
+    // Wait for load animation to finish, then switch to scroll mode
+    timers.push(setTimeout(() => setReady(true), 1100));
     return () => timers.forEach(clearTimeout);
   }, []);
 
-  // Phase 2: scroll-driven (full bar at top → 0 at bottom)
+  // Phase 2: scroll-driven only after load animation is done
   useEffect(() => {
-    if (!loaded) return;
+    if (!ready) return;
 
     const calc = () => {
       const scrollTop = window.scrollY;
@@ -32,8 +34,7 @@ export default function TopProgressBar() {
         setScrollPct(100);
         return;
       }
-      const pct = Math.max(0, Math.min(100, 100 - (scrollTop / docHeight) * 100));
-      setScrollPct(pct);
+      setScrollPct(Math.max(0, Math.min(100, 100 - (scrollTop / docHeight) * 100)));
     };
 
     calc();
@@ -43,20 +44,22 @@ export default function TopProgressBar() {
       window.removeEventListener('scroll', calc);
       window.removeEventListener('resize', calc);
     };
-  }, [loaded]);
+  }, [ready]);
+
+  const pct = ready ? scrollPct : loadPct;
 
   return (
     <div className="fixed top-0 inset-x-0 z-[60] h-[3px]">
       <div
         className="h-full"
         style={{
-          width: `${scrollPct}%`,
+          width: `${pct}%`,
           background: 'linear-gradient(90deg, var(--gold), var(--gold-secondary), var(--gold))',
           boxShadow: '0 0 12px rgba(232,168,32,0.6), 0 0 24px rgba(232,168,32,0.3)',
-          transition: loaded ? 'width 0.1s ease-out' : 'width 0.2s ease-out',
+          transition: ready ? 'width 0.15s ease-out' : 'width 0.2s ease-out',
         }}
       />
-      <div className="absolute inset-0 overflow-hidden" style={{ width: `${scrollPct}%` }}>
+      <div className="absolute inset-0 overflow-hidden" style={{ width: `${pct}%` }}>
         <div className="progress-sheen" />
       </div>
     </div>
